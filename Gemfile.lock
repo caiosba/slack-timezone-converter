@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/caiosba/slack-rtmapi
-  revision: 5be596228711c4bc58b9fd68f842a524a914c5c9
-  ref: 5be5962
+  revision: 2e8a9eea1002a44b79393c963f7b8bb832ebe23f
+  ref: 2e8a9ee
   specs:
     slack-rtmapi (1.0.0.rc4)
       websocket-driver
