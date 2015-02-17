@@ -14,7 +14,7 @@ TIME_PATTERN = /(([0-2]?[0-9][:hH][0-5]?[0-9]?)|([0-9][0-9]? ?[aApP][mM]))/ # Wh
 
 def offset_int2str(int)
   str = ''
-  str += '-' if int < 0
+  str += (int < 0 ? '-' : '+')
   str += '0' if int.abs < 10
   str += int.abs.to_s
   str + ':00'
@@ -48,7 +48,10 @@ end
 # Get users list and all available timezones
 
 uri = URI.parse("https://slack.com/api/users.list?token=#{TOKEN}")
-response = Net::HTTP.get_response(uri)
+http = Net::HTTP.new(uri.host, uri.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+response = http.get(uri.request_uri)
 timezones = {}
 JSON.parse(response.body)['members'].each do |user|
   offset, label = user['tz_offset'], user['tz_label']
