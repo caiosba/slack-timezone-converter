@@ -1,0 +1,5 @@
+*.json
+*.sw*
+*~
+run.sh
+slack-rtmapi
