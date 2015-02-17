@@ -2,6 +2,8 @@
 
 An integration for Slack that converts any time string in a message to all timezones where the team is.
 
+![Screenshot](timezone.png?raw=true "Screenshot")
+
 Currently supports the following formats (with or without leading zeros), but new formats can be added easily:
 
 * 10am
