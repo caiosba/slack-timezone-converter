@@ -30,6 +30,10 @@ In order to use this integration, the following Ruby libraries are needed:
 * time
 * uri
 
+But they can be installed by using `bundle`:
+
+`bundle install`
+
 After all requirements are met, it's just necessary to run the code, passing the Slack token and default timezone (e.g., "PST")
 as parameters:
 
@@ -41,4 +45,4 @@ This program runs indefinitely and listens for new messages on the Slack channel
 
 * https://api.slack.com/web#basics
 * https://api.slack.com/rtm
-* https://github.com/mackwic/slack-rtmapi
+* https://github.com/caiosba/slack-rtmapi

@@ -1,8 +1,8 @@
-require 'slack-rtmapi'
-require 'time'
+require 'rubygems'
+require 'bundler/setup'
 require 'date'
 require 'json'
-require 'uri'
+Bundler.require
 
 # Currently supported formats: 10am 10 am 10 AM 10AM 10pm 10PM 10 pm 10 PM 10h 10H 10h30 10H30 10:30 (with or without leading zeros)
 

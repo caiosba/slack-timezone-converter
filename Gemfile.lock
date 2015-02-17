@@ -1,0 +1,19 @@
+GIT
+  remote: https://github.com/caiosba/slack-rtmapi
+  revision: 8755a78422bb0b6435792e048b2c4d7a66b77570
+  specs:
+    slack-rtmapi (1.0.0.rc4)
+      websocket-driver
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    websocket-driver (0.5.1)
+      websocket-extensions (>= 0.1.0)
+    websocket-extensions (0.1.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  slack-rtmapi!
