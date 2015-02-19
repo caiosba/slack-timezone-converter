@@ -27,6 +27,12 @@ After all requirements are met, it's just necessary to run the code, passing the
 
 This program runs indefinitely and listens for new messages on the Slack channels. It can be stopped by just stopping the process.
 
+## TODO
+
+* Use the sender's timezone instead of the bot's timezone as the default
+* Be able to parse more than one time string per message
+* Use abbreviations instead of the full timezone name on the output
+
 ## References
 
 * https://api.slack.com/web#basics
