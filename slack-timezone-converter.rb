@@ -1,14 +1,13 @@
 require 'rubygems'
 require 'bundler/setup'
+require 'active_support/all'
+require 'time'
 require 'date'
 require 'json'
 Bundler.require
 
-# Currently supported formats: 10am 10 am 10 AM 10AM 10pm 10PM 10 pm 10 PM 10h 10H 10h30 10H30 10:30 (with or without leading zeros)
-
-TOKEN = ARGV.first                                                          # Get one at https://api.slack.com/web#basics
-DEFAULT_TIMEZONE = ARGV.last                                                # Any supported string, like 'PST' for example
-TIME_PATTERN = /(([0-2]?[0-9][:hH][0-5]?[0-9]?)|([0-9][0-9]? ?[aApP][mM]))/ # Which time formats we are able to parse
+TOKEN = ARGV[0]         # Get one at https://api.slack.com/web#basics
+PER_LINE = ARGV[1] || 1 # Number of times per line
 
 # Function to convert from a time offset (like '-3') to a valid offset string (like '-03:00')
 
@@ -28,24 +27,16 @@ def slack_clock_emoji_from_time(time)
   ":clock#{hour}:"
 end
 
-# Parse text and looks for time patterns
+# Get the current user from token
 
-def parse(text)
-  matches = []
-  text.scan(TIME_PATTERN).each do |match|
-    time = match.first.gsub(/[hH]([0-9][0-9])/, ':\1').gsub(/[hH]/, '')
-    unless (time =~ /[aApP][mM]/).nil?
-      time = time.gsub(/[^0-9]+/, '').to_i
-      time += 12 if !(match.first =~ /[pP][mM]/).nil? and time < 12
-      time = 0 if !(match.first =~ /[aA][mM]/).nil? and time == 12
-      time = time.to_s + ':00'
-    end
-    matches << time + ':00'
-  end
-  matches
-end
+uri = URI.parse("https://slack.com/api/auth.test?token=#{TOKEN}")
+http = Net::HTTP.new(uri.host, uri.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+response = http.get(uri.request_uri)
+CURRENT_USER = JSON.parse(response.body)['user_id']
 
-# Get users list and all available timezones
+# Get users list and all available timezones and set default timezone
 
 uri = URI.parse("https://slack.com/api/users.list?token=#{TOKEN}")
 http = Net::HTTP.new(uri.host, uri.port)
@@ -53,11 +44,16 @@ http.use_ssl = true
 http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 response = http.get(uri.request_uri)
 timezones = {}
+maxlen = 0
 JSON.parse(response.body)['members'].each do |user|
   offset, label = user['tz_offset'], user['tz_label']
   next if offset.nil? or offset == 0 or label.nil?
   timezones[label] = offset / 3600 unless timezones.has_key?(label)
+  maxlen = label.length if label.length > maxlen
+  DEFAULT_TIMEZONE = ActiveSupport::TimeZone[timezones[label]].tzinfo.name if user['id'] == CURRENT_USER
 end
+
+ENV['TZ'] = DEFAULT_TIMEZONE
 
 # Connect to Slack
 
@@ -69,30 +65,32 @@ client = SlackRTM::Client.new websocket_url: url
 puts "[#{Time.now}] Connected to Slack!"
 
 client.on :message do |data|
-  if data['type'] === 'message' and !data['text'].nil? and data['subtype'].nil? and data['reply_to'].nil?
+  if data['type'] === 'message' and !data['text'].nil? and data['subtype'].nil? and data['reply_to'].nil? and
+     !data['text'].match(/[0-9]([hH]|( ?[aA][mM])|( ?[pP][mM])|(:[0-9]{2}))/).nil?
     
     # Identify time patterns
-    matches = parse(data['text'])
-    matches.each do |match|
-      begin
-        timestr = "2015-01-01 #{match} #{DEFAULT_TIMEZONE}"
-        puts "[#{Time.now}] Got time #{timestr}"
-        time = DateTime.parse(timestr)
+    #begin
+      time = DateTime.parse(Time.parse(data['text']).to_s)
+      puts "[#{Time.now}] Got time #{time}"
 
-        text = []
-        timezones.each do |label, offset|
-          zone = offset_int2str(offset)
-          localtime = time.new_offset(zone)
-          emoji = slack_clock_emoji_from_time(localtime)
-          text << "#{emoji} *#{localtime.strftime('%H:%M')}* `(#{label})`\n"
-        end
-
-        puts "[#{Time.now}] Sending message..."
-        client.send({ type: 'message', channel: data['channel'], text: text.join })
-      rescue
-        puts "[#{Time.now}] Invalid date"
+      text = []
+      i = 0
+      timezones.each do |label, offset|
+        i += 1
+        zone = offset_int2str(offset)
+        localtime = time.new_offset(zone)
+        emoji = slack_clock_emoji_from_time(localtime)
+        space = " " * (maxlen - label.length)
+        message = "#{emoji} *#{localtime.strftime('%H:%M')}* `(#{label})#{space}`"
+        message += (i % PER_LINE.to_i == 0) ? "\n" : " "
+        text << message
       end
-    end
+
+      puts "[#{Time.now}] Sending message..."
+      client.send({ type: 'message', channel: data['channel'], text: text.join })
+    #rescue
+      # Just ignore the message
+    #end
   end
 end
 
