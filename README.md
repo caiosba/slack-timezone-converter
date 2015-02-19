@@ -4,7 +4,7 @@ An integration for Slack that converts any time string in a message to all timez
 
 ![Screenshot](timezone.png?raw=true "Screenshot")
 
-Currently supports any format parsable by the [Ruby's Time class](http://ruby-doc.org/stdlib-2.1.1/libdoc/time/rdoc/Time.html#method-c-parse).
+Currently supports any format parsable by [ActiveSupport](http://api.rubyonrails.org/classes/ActiveSupport/TimeWithZone.html).
 
 Any time a time string is found in a message, the integration, running in a server, converts it to all timezones
 where the team has at least one member. A message is sent back to the Slack channel with all the conversions and a fancy clock icon
@@ -15,8 +15,6 @@ In order to use this integration, the following Ruby libraries are needed:
 
 * slack-rtmapi
 * active\_support
-* time
-* date
 * json
 
 But they can be installed by using `bundle`:
