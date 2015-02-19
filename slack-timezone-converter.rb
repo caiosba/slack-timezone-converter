@@ -69,7 +69,7 @@ client.on :message do |data|
      !data['text'].match(/[0-9]([hH]|( ?[aA][mM])|( ?[pP][mM])|(:[0-9]{2}))/).nil?
     
     # Identify time patterns
-    #begin
+    begin
       time = DateTime.parse(Time.parse(data['text']).to_s)
       puts "[#{Time.now}] Got time #{time}"
 
@@ -88,9 +88,9 @@ client.on :message do |data|
 
       puts "[#{Time.now}] Sending message..."
       client.send({ type: 'message', channel: data['channel'], text: text.join })
-    #rescue
+    rescue
       # Just ignore the message
-    #end
+    end
   end
 end
 
