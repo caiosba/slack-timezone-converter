@@ -55,11 +55,12 @@ puts "[#{Time.now}] Connected to Slack!"
 
 client.on :message do |data|
   if data['type'] === 'message' and !data['text'].nil? and data['subtype'].nil? and data['reply_to'].nil? and
-     !data['text'].match(/[0-9]([hH]|( ?[aA][mM])|( ?[pP][mM])|(:[0-9]{2}))/).nil?
+     !data['text'].match(/[0-9](([hH]([0123456789 ?:,;.]|$))|( ?[aA][mM])|( ?[pP][mM])|(:[0-9]{2}))/).nil?
     
     # Identify time patterns
     begin
-      time = Time.zone.parse(data['text']).utc
+      text = data['text'].gsub(/<[^>]+>/, '')
+      time = Time.zone.parse(text).utc
       puts "[#{Time.now}] Got time #{time}"
 
       text = []
