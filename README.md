@@ -25,7 +25,7 @@ But they can be installed by using `bundle`:
 
 After all requirements are met, it's just necessary to run the code, passing the Slack token as parameter:
 
-`ruby slack-timezone-converter.rb <Slack token> <number of times per line (defaults to 1)>`
+`ruby slack-timezone-converter.rb <Slack token> <number of times per line (defaults to 1)> <additional message>`
 
 This program runs indefinitely and listens for new messages on the Slack channels. It can be stopped by just stopping the process.
 

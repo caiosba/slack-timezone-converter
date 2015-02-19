@@ -8,6 +8,7 @@ Bundler.require
 
 TOKEN = ARGV[0]         # Get one at https://api.slack.com/web#basics
 PER_LINE = ARGV[1] || 1 # Number of times per line
+MESSAGE = ARGV[2].to_s  # Additional message to be appended
 
 # Function to convert from a time offset (like '-3') to a valid offset string (like '-03:00')
 
@@ -85,6 +86,8 @@ client.on :message do |data|
         message += (i % PER_LINE.to_i == 0) ? "\n" : " "
         text << message
       end
+
+      text << (MESSAGE % time.to_i.to_s)
 
       puts "[#{Time.now}] Sending message..."
       client.send({ type: 'message', channel: data['channel'], text: text.join })
