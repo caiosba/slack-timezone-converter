@@ -32,6 +32,7 @@ This program runs indefinitely and listens for new messages on the Slack channel
 * Use the sender's timezone instead of the bot's timezone as the default
 * Be able to parse more than one time string per message
 * Use abbreviations instead of the full timezone name on the output
+* Correctly identify the format where a dot is the separator between hour and minutes (e.g., "8.30am")
 
 ## References
 
