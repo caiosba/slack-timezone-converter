@@ -49,7 +49,7 @@ JSON.parse(response.body)['members'].each do |user|
     timezones.delete(key)
     label = key + ' / ' + label
   end
-  timezones[label] = offset unless timezones.has_key?(label)
+  timezones[label] = offset unless timezones.has_value?(offset)
   maxlen = label.length if label.length > maxlen
   DEFAULT_TIMEZONE = ActiveSupport::TimeZone[timezones[label]].tzinfo.name if user['id'] == CURRENT_USER
 end
