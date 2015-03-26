@@ -16,6 +16,12 @@ def slack_clock_emoji_from_time(time)
   ":clock#{hour}:"
 end
 
+# Normalize times
+
+def normalize(text)
+  text.gsub(/([0-9]{1,2})([0-9]{2})( ?([aA]|[pP])[mM])/, '\1:\2\3')
+end
+
 # Get the current user from token
 
 uri = URI.parse("https://slack.com/api/auth.test?token=#{TOKEN}")
@@ -59,7 +65,7 @@ client.on :message do |data|
     
     # Identify time patterns
     begin
-      text = data['text']
+      text = normalize data['text']
       time = Time.zone.parse(text).utc
       puts "[#{Time.now}] Got time #{time}"
 
