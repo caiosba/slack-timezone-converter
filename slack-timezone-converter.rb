@@ -42,8 +42,14 @@ timezones = {}
 maxlen = 0
 JSON.parse(response.body)['members'].each do |user|
   offset, label = user['tz_offset'], user['tz_label']
-  next if offset.nil? or offset == 0 or label.nil?
-  timezones[label] = offset / 3600 unless timezones.has_key?(label)
+  next if offset.nil? or offset == 0 or label.nil? or user['deleted']
+  label = label.gsub(/[a-z ]/, '')
+  offset /= 3600
+  if key = timezones.key(offset) and !key.split(' / ').include?(label)
+    timezones.delete(key)
+    label = key + ' / ' + label
+  end
+  timezones[label] = offset unless timezones.has_key?(label)
   maxlen = label.length if label.length > maxlen
   DEFAULT_TIMEZONE = ActiveSupport::TimeZone[timezones[label]].tzinfo.name if user['id'] == CURRENT_USER
 end
@@ -75,7 +81,7 @@ client.on :message do |data|
         i += 1
         localtime = time + offset.to_i.hours
         emoji = slack_clock_emoji_from_time(localtime)
-        space = " " * (maxlen - label.length)
+        space = "" # " " * (maxlen - label.length)
         message = "#{emoji} *#{localtime.strftime('%H:%M')}* `(#{label})#{space}`"
         message += (i % PER_LINE.to_i == 0) ? "\n" : " "
         text << message
