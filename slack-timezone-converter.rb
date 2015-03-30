@@ -39,6 +39,7 @@ http.use_ssl = true
 http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 response = http.get(uri.request_uri)
 timezones = {}
+users = {}
 
 JSON.parse(response.body)['members'].each do |user|
   offset, label = user['tz_offset'], user['tz']
@@ -50,10 +51,12 @@ JSON.parse(response.body)['members'].each do |user|
     label = key + ' / ' + label
   end
   timezones[label] = offset unless timezones.has_value?(offset)
-  DEFAULT_TIMEZONE = ActiveSupport::TimeZone[timezones[label]].tzinfo.name if user['id'] == CURRENT_USER
+  users[user['id']] = { offset: offset, tz: ActiveSupport::TimeZone[offset].tzinfo.name }
 end
 
-Time.zone = DEFAULT_TIMEZONE
+timezones = timezones.sort_by{ |key, value| value }
+
+Time.zone = users[CURRENT_USER][:tz]
 
 # Connect to Slack
 
@@ -70,6 +73,7 @@ client.on :message do |data|
     
     # Identify time patterns
     begin
+      Time.zone = users[data['user']][:tz]
       text = normalize data['text']
       time = Time.zone.parse(text).utc
       puts "[#{Time.now}] Got time #{time}"
@@ -82,7 +86,7 @@ client.on :message do |data|
         emoji = slack_clock_emoji_from_time(localtime)
         message = "#{emoji} #{localtime.strftime('%H:%M')} #{label}"
         message += (i % PER_LINE.to_i == 0) ? "\n" : " "
-        text << message
+        text << (offset == users[data['user']][:offset] ? "_#{message}_" : message)
       end
 
       text << (MESSAGE % time.to_i.to_s)
