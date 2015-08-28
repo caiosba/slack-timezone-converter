@@ -86,7 +86,7 @@ client.on :message do |data|
         emoji = slack_clock_emoji_from_time(localtime)
         message = "#{emoji} #{localtime.strftime('%H:%M')} #{label}"
         message += (i % PER_LINE.to_i == 0) ? "\n" : " "
-        text << (offset == users[data['user']][:offset] ? "_#{message}_" : message)
+        text << (offset == users[data['user']][:offset] ? "#{message}" : message)
       end
 
       text << (MESSAGE % time.to_i.to_s)
