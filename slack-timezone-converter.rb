@@ -68,7 +68,7 @@ client = SlackRTM::Client.new websocket_url: url
 puts "[#{Time.now}] Connected to Slack!"
 
 client.on :message do |data|
-  if data['type'] === 'message' and !data['text'].nil? and data['subtype'].nil? and data['reply_to'].nil? and
+  if data['type'] === 'message' and !data['text'].nil? and data['subtype'].nil? and data['reply_to'].nil? and data['text'].include?("@time") and
      !data['text'].gsub(/<[^>]+>/, '').match(/[0-9](([hH]([0123456789 ?:,;.]|$))|( ?[aA][mM])|( ?[pP][mM])|(:[0-9]{2}))/).nil?
     
     # Identify time patterns
@@ -86,7 +86,7 @@ client.on :message do |data|
         emoji = slack_clock_emoji_from_time(localtime)
         message = "#{emoji} #{localtime.strftime('%H:%M')} #{label}"
         message += (i % PER_LINE.to_i == 0) ? "\n" : " "
-        text << (offset == users[data['user']][:offset] ? "_#{message}_" : message)
+        text << (offset == users[data['user']][:offset] ? "#{message}" : message)
       end
 
       text << (MESSAGE % time.to_i.to_s)
