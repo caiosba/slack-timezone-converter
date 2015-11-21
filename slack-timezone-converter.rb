@@ -43,7 +43,7 @@ Time.zone = users[CURRENT_USER][:tz]
 
 url = SlackRTM.get_url token: TOKEN 
 client = SlackRTM::Client.new websocket_url: url
-adjuster = TimezoneAdjuster.new(CURRENT_USER, timezones, MESSAGE)
+adjuster = TimezoneAdjuster.new(timezones, MESSAGE, PER_LINE)
 
 # Listen for new messages (events of type "message")
 

@@ -1,3 +1,4 @@
+require 'active_support/time'
 # Get a Slack clock emoji from a time object
 
 def slack_clock_emoji_from_time(time)
@@ -13,10 +14,10 @@ def normalize(text)
 end
 
 class TimezoneAdjuster
-	def initialize(current_user:, timezones:, prepended_message:)
-		@current_user = current_user
+	def initialize(timezones:, prepended_message: '', per_line: 1)
 		@timezones = timezones
 		@prepended_message = prepended_message
+		@per_line = per_line
 	end
 	def get_list_for(users:, data:)
 		if data['type'] === 'message' and !data['text'].nil? and data['subtype'].nil? and data['reply_to'].nil? and data['text'].include?("@time") and
@@ -36,14 +37,15 @@ class TimezoneAdjuster
 					localtime = time + offset.to_i.hours
 					emoji = slack_clock_emoji_from_time(localtime)
 					message = "#{emoji} #{localtime.strftime('%H:%M')} #{label}"
-					message += (i % PER_LINE.to_i == 0) ? "\n" : " "
+					message += (i % @per_line.to_i == 0) ? "\n" : " "
 					text << (offset == users[data['user']][:offset] ? "#{message}" : message)
 				end
 
 				text << (@prepended_message % time.to_i.to_s)
 
 				return text.join
-			rescue
+			rescue Exception => e
+				puts e.message
 				return nil
 			end
 		end
