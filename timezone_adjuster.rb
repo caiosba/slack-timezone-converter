@@ -13,12 +13,12 @@ def normalize(text)
 end
 
 class TimezoneAdjuster
-	def initialize(current_user, timezones, prepended_message)
+	def initialize(current_user:, timezones:, prepended_message:)
 		@current_user = current_user
 		@timezones = timezones
 		@prepended_message = prepended_message
 	end
-	def get_list_for(users, data)
+	def get_list_for(users:, data:)
 		if data['type'] === 'message' and !data['text'].nil? and data['subtype'].nil? and data['reply_to'].nil? and data['text'].include?("@time") and
 			 !data['text'].gsub(/<[^>]+>/, '').match(/[0-9](([hH]([0123456789 ?:,;.]|$))|( ?[aA][mM])|( ?[pP][mM])|(:[0-9]{2}))/).nil?
 			
