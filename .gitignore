@@ -1,3 +1,6 @@
+.bundle/
+bin/
+.rspec
 *.json
 *.sw*
 *~
