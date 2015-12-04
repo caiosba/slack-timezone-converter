@@ -7,7 +7,7 @@ require_relative 'slack_util'
 require_relative 'timezone_adjuster'
 Bundler.require
 
-log = Logger.new(STDOUT)
+$log = Logger.new(STDOUT)
 
 TOKEN = ARGV[0] || ENV['TOKEN'] # Get one at https://api.slack.com/web#basics
 PER_LINE = ARGV[1] || 1         # Number of times per line
@@ -47,17 +47,17 @@ adjuster = TimezoneAdjuster.new(timezones: timezones, prepended_message: MESSAGE
 
 # Listen for new messages (events of type "message")
 
-log.info("Connected to Slack")
+$log.info "Connected to Slack"
 
 client.on :message do |data|
   message_text = adjuster.get_list_for(users: users, data: data)
   if !message_text.nil?
-    log.debug("Sending message: #{message_text}")
+    $log.debug "Sending message: #{message_text}"
     begin
       client.send({ type: 'message', channel: data['channel'], text: message_text })
     rescue
       # Just ignore the message
-      log.error("Death sending that message.")
+      $log.error "Death sending that message."
     end
   end
 end
