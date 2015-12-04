@@ -45,7 +45,7 @@ class TimezoneAdjuster
 
 				return text.join
 			rescue Exception => e
-				puts e.message
+				$log.error e
 				return nil
 			end
 		end

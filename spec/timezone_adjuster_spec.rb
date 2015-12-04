@@ -1,4 +1,7 @@
+require 'logger'
 require_relative '../timezone_adjuster'
+
+$log = Logger.new(STDOUT)
  
 describe TimezoneAdjuster do
 	describe '#get_list_for' do
