@@ -9,20 +9,20 @@ Bundler.require
 
 log = Logger.new(STDOUT)
 
-TOKEN = ARGV[0]         # Get one at https://api.slack.com/web#basics
-PER_LINE = ARGV[1] || 1 # Number of times per line
-MESSAGE = ARGV[2].to_s  # Additional message to be appended
+TOKEN = ARGV[0] || ENV['TOKEN'] # Get one at https://api.slack.com/web#basics
+PER_LINE = ARGV[1] || 1         # Number of times per line
+MESSAGE = ARGV[2].to_s          # Additional message to be appended
 
 # Get the current user from token
 
-CURRENT_USER = SlackUtil.CurrentUser(TOKEN)
+CURRENT_USER = SlackUtil.get_current_user(TOKEN)
 
 # Get users list and all available timezones and set default timezone
 
 timezones = {}
 users = {}
 
-SlackUtil.AllUsers(TOKEN).each do |user|
+SlackUtil.get_all_users(TOKEN).each do |user|
   offset, label = user['tz_offset'], user['tz']
   next if offset.nil? or offset == 0 or label.nil? or user['deleted']
   label = ActiveSupport::TimeZone.find_tzinfo(label).current_period.abbreviation.to_s
@@ -43,14 +43,14 @@ Time.zone = users[CURRENT_USER][:tz]
 
 url = SlackRTM.get_url token: TOKEN 
 client = SlackRTM::Client.new websocket_url: url
-adjuster = TimezoneAdjuster.new(timezones, MESSAGE, PER_LINE)
+adjuster = TimezoneAdjuster.new(timezones: timezones, prepended_message: MESSAGE, per_line: PER_LINE)
 
 # Listen for new messages (events of type "message")
 
 log.info("Connected to Slack")
 
 client.on :message do |data|
-  message_text = adjuster.get_list_for(users, data)
+  message_text = adjuster.get_list_for(users: users, data: data)
   if !message_text.nil?
     log.debug("Sending message: #{message_text}")
     begin
