@@ -23,9 +23,18 @@ timezones = {}
 users = {}
 
 SlackUtil.get_all_users(TOKEN).each do |user|
-  offset, label = user['tz_offset'], user['tz']
-  next if offset.nil? or offset == 0 or label.nil? or user['deleted']
-  label = ActiveSupport::TimeZone.find_tzinfo(label).current_period.abbreviation.to_s
+  offset, user_tz, alt_tz_label = user['tz_offset'], user['tz'], user['tz_label']
+
+  # Bots don't have `tz` set for some reason, but they do have `tz_label` set and it
+  # will (probably) be in the Pacific TZ
+  if user_tz.nil? and not alt_tz_label.nil? and alt_tz_label.start_with?('Pacific')
+    user_tz = 'America/Los_Angeles'
+  end
+
+  next if offset.nil? or user_tz.nil? or user['deleted']
+
+  label = ActiveSupport::TimeZone.find_tzinfo(user_tz).current_period.abbreviation.to_s
+  # Offsets are expressed in seconds for some reason
   offset /= 3600
   if key = timezones.key(offset) and !key.split(' / ').include?(label)
     timezones.delete(key)
