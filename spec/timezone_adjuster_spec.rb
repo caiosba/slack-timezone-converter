@@ -8,7 +8,7 @@ describe TimezoneAdjuster do
 		subject do 
 			TimezoneAdjuster.new(:timezones => {'CST' => -21600})
 		end
-		let(:data) { {'type' => 'message', 'text' => '@time 12pm', 'user' => 'user'} }
+		let(:data) { {'type' => 'message', 'text' => '12pm', 'user' => 'user'} }
 
 		def get_list_for_user
 			subject.get_list_for(:users => {'user' => { :tz => 'UTC', :offset => 0 }}, :data => data)
@@ -28,10 +28,6 @@ describe TimezoneAdjuster do
 		end
 		context 'when the notification has a reply_to in it' do
 			let(:data) { super().merge('reply_to' => 'reply_to') }
-			it { expect(get_list_for_user).to be_nil }
-		end
-		context 'when text doesn\'t contain "@time"' do
-			let(:data) { super().merge('text' => '12pm') }
 			it { expect(get_list_for_user).to be_nil }
 		end
 		context 'when text doesn\'t contain a time' do

@@ -6,12 +6,8 @@ An integration for Slack that converts any time string in a message to all timez
 
 Currently supports any format parsable by [ActiveSupport](http://api.rubyonrails.org/classes/ActiveSupport/TimeWithZone.html).
 
-Any time a time string is found in a message that mentions `@time`, the integration, running in a server, converts it to all timezones
-where the team has at least one member. A message is sent back to the Slack channel with all the conversions and a fancy clock icon
-that represents the time. It supports any channel joined by the user whose token is passed as parameter. This user's timezone is used
-as the default when a timezone is not present on the parsed message.
-
-Example message that would be parsed: `Hey, our meeting is at 12h30 PDT @time`.
+Monitors any channel it is in for messages that look like they contain a time and responds with local times for all the members 
+in the channel.
 
 In order to use this integration, the following Ruby libraries are needed:
 
@@ -19,7 +15,7 @@ In order to use this integration, the following Ruby libraries are needed:
 * active\_support
 * json
 
-But they can be installed by using `bundle`:
+They can be installed by using `bundle`:
 
 `bundle install`
 

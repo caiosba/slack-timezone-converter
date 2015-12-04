@@ -1,19 +1,31 @@
 require 'json'
 
-module SlackUtil
-	def SlackUtil.get_json(url)
-		uri = URI.parse(url)
+class SlackUtil
+	def initialize(token:)
+		@token = token
+	end
+
+	def get_json(endpoint, additional_queries: '')
+		uri = URI.parse("https://slack.com/api/#{endpoint}?token=#{@token}#{additional_queries}")
 		http = Net::HTTP.new(uri.host, uri.port)
 		http.use_ssl = true
 		response = http.get(uri.request_uri)
 		return JSON.parse(response.body)
 	end
 
-	def SlackUtil.get_current_user(token)
-		return get_json("https://slack.com/api/auth.test?token=#{token}")['user_id']
+	def get_current_user()
+		return get_json("auth.test")['user_id']
 	end
 
-	def SlackUtil.get_all_users(token)
-		return get_json("https://slack.com/api/users.list?token=#{TOKEN}")['members']
+	def get_all_users()
+		return get_json("users.list")['members']
+	end
+
+	def get_channel(channel)
+		return get_json("channels.info", additional_queries: "&channel=#{channel}")['channel']
+	end
+
+	def get_user(user)
+		return get_json("users.info", additional_queries: "&user=#{user}")['user']
 	end
 end
