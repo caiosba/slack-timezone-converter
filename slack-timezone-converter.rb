@@ -56,7 +56,7 @@ end
 
 timezones = timezones.sort_by{ |key, value| value }
 
-Time.zone = users[CURRENT_USER][:tz]
+#Time.zone = users[CURRENT_USER][:tz]
 
 # Connect to Slack
 
