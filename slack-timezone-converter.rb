@@ -40,7 +40,6 @@ http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 response = http.get(uri.request_uri)
 timezones = {}
 users = {}
-
 JSON.parse(response.body)['members'].each do |user|
   offset, label = user['tz_offset'], user['tz']
   next if offset.nil? or offset == 0 or label.nil? or user['deleted']
@@ -68,7 +67,7 @@ client = SlackRTM::Client.new websocket_url: url
 puts "[#{Time.now}] Connected to Slack!"
 
 client.on :message do |data|
-  if data['type'] === 'message' and !data['text'].nil? and data['subtype'].nil? and data['reply_to'].nil? and data['text'].include?("@time") and
+  if data['type'] === 'message' and !data['text'].nil? and data['subtype'].nil? and data['reply_to'].nil? and (data['text'].include?("@time") or data['text'].include?("@U03N0KXMD") or data['text'].include?("@timebot") or data['text'].include?("@U5D0ARDSS")) and
      !data['text'].gsub(/<[^>]+>/, '').match(/[0-9](([hH]([0123456789 ?:,;.]|$))|( ?[aA][mM])|( ?[pP][mM])|(:[0-9]{2}))/).nil?
     
     # Identify time patterns
