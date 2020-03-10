@@ -4,6 +4,12 @@ An integration for Slack that converts any time string in a message to all timez
 
 ![Screenshot](timezone.png?raw=true "Screenshot")
 
+## Usage
+
+Just invite the @bot to your channel. Then, any message that mentions @time and contains a time will be converted, for example: `Let's meet at 8am PDT please @time`.
+
+## Description
+
 Currently supports any format parsable by [ActiveSupport](http://api.rubyonrails.org/classes/ActiveSupport/TimeWithZone.html).
 
 Any time a time string is found in a message that mentions `@time`, the integration, running in a server, converts it to all timezones
@@ -12,6 +18,8 @@ that represents the time. It supports any channel joined by the user whose token
 as the default when a timezone is not present on the parsed message.
 
 Example message that would be parsed: `Hey, our meeting is at 12h30 PDT @time`.
+
+## Installation
 
 In order to use this integration, the following Ruby libraries are needed:
 
