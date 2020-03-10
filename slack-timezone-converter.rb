@@ -72,7 +72,7 @@ client.on :message do |data|
     
     # Identify time patterns
     begin
-      Time.zone = users[data['user']][:tz]
+      Time.zone = begin users[data['user']][:tz] rescue users[CURRENT_USER][:tz] end
       text = normalize data['text']
       time = Time.zone.parse(text).utc
       puts "[#{Time.now}] Got time #{time}"
@@ -85,15 +85,16 @@ client.on :message do |data|
         emoji = slack_clock_emoji_from_time(localtime)
         message = "#{emoji} #{localtime.strftime('%H:%M')} #{label}"
         message += (i % PER_LINE.to_i == 0) ? "\n" : " "
-        text << (offset == users[data['user']][:offset] ? "#{message}" : message)
+        text << (users[data['user']] && offset == users[data['user']][:offset] ? "#{message}" : message)
       end
 
       text << (MESSAGE % time.to_i.to_s)
 
       puts "[#{Time.now}] Sending message..."
       client.send({ type: 'message', channel: data['channel'], text: text.join })
-    rescue
+    rescue Exception => e
       # Just ignore the message
+      puts "Exception: #{e.message}"
     end
   end
 end
