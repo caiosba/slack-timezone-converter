@@ -13,7 +13,7 @@ MESSAGE = ARGV[2].to_s  # Additional message to be appended
 def slack_clock_emoji_from_time(time)
   hour = time.hour % 12
   hour = 12 if hour == 0
-  ":clock#{hour}:"
+  time.min==30? ":clock#{hour}30:" : ":clock#{hour}:"
 end
 
 # Normalize times
